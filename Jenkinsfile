@@ -8,5 +8,10 @@ pipeline {
             sh "sudo python3 manage.py migrate"
          }
       }
+      stage('Test') {
+         steps {
+            sh "echo Testing"
+         }
+      }
    }
 }
