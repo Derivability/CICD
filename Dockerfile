@@ -8,5 +8,4 @@ ENV PYTHONUNBUFFERED 1
 COPY ./requirements.txt /usr/src/django/requirements.txt
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY . /usr/src/django/
 CMD echo TEST

@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': 'django_db',
         'USER': 'django_user',
         'PASSWORD': 'django_unleashed',
-        'HOST': '127.0.0.1',
+        'HOST': 'database',
         'PORT': '5432',
     }
 }
