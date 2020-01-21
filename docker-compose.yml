@@ -1,16 +1,21 @@
-version: '3'
+version: '2.1'
 
 services:
   db:
     build: ./db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   web:
-    build: .
-    command: bash -c 'while !</dev/tcp/database/5432; do sleep 1; done; python manage.py migrate; python manage.py runserver 0.0.0.0:8000'
+    build: ./web
     volumes:
-      - .:/usr/src/django
+      - ./web:/usr/src/django
     ports:
       - "8000:8000"
     links:
       - "db:database"
     depends_on:
-      - db
+      db:
+         condition: service_healthy
