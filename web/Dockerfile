@@ -10,6 +10,5 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 CMD python manage.py migrate && ./initadmin 
-CMD python manage.py test polls
-CMD echo $? > file.txt
+CMD python manage.py test polls || touch failed.err
 #&& python manage.py runserver 0.0.0.0:8000
