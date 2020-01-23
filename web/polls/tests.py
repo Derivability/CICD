@@ -14,7 +14,7 @@ class PollsTest(TestCase):
     def test_question_creation(self):
         q = self.create_question()
         self.assertTrue(isinstance(q, Question))
-        self.assertEqual("only a test1", q.question_text)
+        self.assertEqual("only a test", q.question_text)
 
     def test_choice_creation(self):
         q = self.create_question()
