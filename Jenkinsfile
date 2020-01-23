@@ -17,4 +17,11 @@ pipeline {
          }
       }
    }
+   post {
+      failure {
+         telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. \
+         Commit author: \"${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}\" \
+         More info: ${BUILD_URL}"
+      }
+   }
 }

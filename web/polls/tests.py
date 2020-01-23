@@ -23,4 +23,4 @@ class PollsTest(TestCase):
         a = self.create_choice(q)
 
         self.assertTrue(isinstance(a, Choice))
-        self.assertEqual(PollsTest.text_choice, a.choice_text)
+        self.assertEqual('1', a.choice_text)
