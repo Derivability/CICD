@@ -18,10 +18,11 @@ pipeline {
       }
    }
    post {
+      success {
+        telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeed. More info: ${BUILD_URL}"
+      }
       failure {
-         telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. \
-         Commit author: \"${GIT_COMMITTER_NAME} ${GIT_COMMITTER_EMAIL}\" \
-         More info: ${BUILD_URL}"
+         telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
       }
    }
 }

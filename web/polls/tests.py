@@ -3,6 +3,7 @@ from polls.models import Choice
 from django.utils import timezone
 from polls.models import Question
 
+
 # models test
 class PollsTest(TestCase):
     text_question = "only a test question"
@@ -10,6 +11,7 @@ class PollsTest(TestCase):
 
     def create_question(self):
         return Question.objects.create(question_text=PollsTest.text_question, pub_date=timezone.now())
+
     def create_choice(self, question):
         return Choice.objects.create(choice_text=PollsTest.text_choice, question=question)
 
@@ -23,4 +25,4 @@ class PollsTest(TestCase):
         a = self.create_choice(q)
 
         self.assertTrue(isinstance(a, Choice))
-        self.assertEqual('1', a.choice_text)
+        self.assertEqual(PollsTest.text_choice, a.choice_text)
