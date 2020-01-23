@@ -9,7 +9,7 @@ pipeline {
       }
       stage('Test') {
          steps {
-            sh "echo Testing"
+            sh "docker-compose up --abort-on-container-exit"
          }
       }
    }
