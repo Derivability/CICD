@@ -1,14 +1,14 @@
 FROM python:3.7.5
-
+ARG test
 WORKDIR /usr/src/django
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /usr/src/django/
+COPY ./startup /usr/src/django/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN if [ "$test" = "true" ] ; then ln -s /usr/src/django/startup/test.sh /bin/launch-django; else ln -s /usr/src/django/startup/runserver.sh /bin/launch-django; fi
 
-CMD python manage.py migrate && ./initadmin 
-CMD python manage.py test polls || touch failed.err
-#&& python manage.py runserver 0.0.0.0:8000
+CMD launch-django

@@ -11,7 +11,10 @@ services:
       timeout: 5s
       retries: 5
   web:
-    build: ./web
+    build:
+        context: ./web
+        args:
+          test: ${TEST}
     volumes:
       - ./web:/usr/src/django
     ports:
