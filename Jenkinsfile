@@ -1,10 +1,12 @@
 pipeline {
    agent any
-
+   environment {
+        POSTGRES = '/var/lib/postgresql/data'
+    }
    stages {
       stage('Build') {
          steps {
-            sh "POSTGRES_DATA=/var/lib/postgresql/data docker-compose build"
+            sh "POSTGRES_DATA=${POSTGRES} docker-compose build"
          }
       }
       stage('Test') {
@@ -12,7 +14,7 @@ pipeline {
                 ERROR_FILE = 'web/failed.err'
             }
          steps {
-            sh "TEST=true POSTGRES_DATA=/var/lib/postgresql/data docker-compose up --abort-on-container-exit"
+            sh "TEST=true POSTGRES_DATA=${POSTGRES} docker-compose up --abort-on-container-exit"
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
       }
