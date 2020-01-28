@@ -4,7 +4,7 @@ pipeline {
    stages {
       stage('Build') {
          steps {
-            sh "docker-compose build"
+            sh "POSTGRES_DATA=/var/lib/postgresql/data docker-compose build"
          }
       }
       stage('Test') {
@@ -12,7 +12,7 @@ pipeline {
                 ERROR_FILE = 'web/failed.err'
             }
          steps {
-            sh "TEST=true docker-compose up --abort-on-container-exit"
+            sh "TEST=true POSTGRES_DATA=/var/lib/postgresql/data docker-compose up --build --abort-on-container-exit"
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
       }
