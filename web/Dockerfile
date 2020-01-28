@@ -9,6 +9,6 @@ COPY ./requirements.txt /usr/src/django/
 COPY ./startup /usr/src/django/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-RUN if [ "$mode" = "true" ] ; then ln -s /usr/src/django/startup/test.sh /bin/launch-django; else ln -s /usr/src/django/startup/runserver.sh /bin/launch-django; fi
+RUN echo $mode > /usr/src/django/MODE.log && if [ "$mode" = "true" ] ; then ln -s /usr/src/django/startup/test.sh /bin/launch-django; else ln -s /usr/src/django/startup/runserver.sh /bin/launch-django; fi
 
 CMD launch-django

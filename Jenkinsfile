@@ -1,13 +1,15 @@
 pipeline {
-   agent any
+   agent none
 
    stages {
       stage('Build') {
+         agent { label 'Wraith_slave'}
          steps {
-            sh "docker-compose build"
+            sh "docker-compose build --force"
          }
       }
       stage('Test') {
+         agent { label 'Wraith_slave'}
          environment {
                 ERROR_FILE = 'web/failed.err'
                 TEST= 'true'
