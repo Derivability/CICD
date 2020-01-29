@@ -1,16 +1,18 @@
 pipeline {
-   agent any
-
+   
+   agent none
+   
    stages {
       stage('Build') {
+         agent { label 'Wraith_slave'}
          steps {
-            sh "docker-compose build"
+            sh "docker-compose build --force"
          }
       }
       stage('Test') {
+         agent { label 'Wraith_slave'}
          environment {
                 ERROR_FILE = 'web/failed.err'
-                TEST= 'true'
             }
          steps {
             sh "ln web/startup/test.sh web/launch-django"
@@ -19,12 +21,17 @@ pipeline {
          }
       }
    }
+
    post {
       success {
-        telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeed. More info: ${BUILD_URL}"
+        node('master') {
+           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeed. More info: ${BUILD_URL}"
+         }
       }
       failure {
-         telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
+        node('master') {
+           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
+         }
       }
    }
 }
