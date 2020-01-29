@@ -13,6 +13,7 @@ pipeline {
                 TEST= 'true'
             }
          steps {
+            sh "ln web/startup/test.sh web/launch-django"
             sh "docker-compose up --build --abort-on-container-exit"
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
