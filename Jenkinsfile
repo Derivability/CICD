@@ -6,7 +6,7 @@ pipeline {
       stage('Build') {
          agent { label 'Wraith_slave' }
          steps {
-            sh "docker-compose build --force"
+            sh "docker-compose build"
          }
       }
       stage('Test') {
@@ -16,7 +16,7 @@ pipeline {
             }
          steps {
             sh "ln web/startup/test.sh web/launch-django"
-            sh "docker-compose up --build --abort-on-container-exit"
+            sh "docker-compose up --abort-on-container-exit"
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
       }
@@ -24,7 +24,7 @@ pipeline {
         agent { label 'Deploy_slave' }
         steps {
             sh "ln web/startup/runserver.sh web/launch-django"
-            sh "docker-compose up --build -d"
+            sh "docker-compose up -d"
         }
       }
    }
