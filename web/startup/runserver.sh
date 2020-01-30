@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #Migrate
+python manage.py makemigrations
 python manage.py migrate
 
 cat <<EOF | python manage.py shell

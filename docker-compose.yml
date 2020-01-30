@@ -13,8 +13,6 @@ services:
   web:
     build:
         context: ./web
-        args:
-          mode: ${TEST}
     volumes:
       - ./web:/usr/src/django
     ports:
