@@ -20,10 +20,11 @@ pipeline {
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
       }
-      stage('Deploy') {
-        agent { label 'Deploy_slave' }
+      stage('Staging') {
+        agent { label 'Staging_slave' }
         steps {
             sh "ln web/startup/runserver.sh web/launch-django"
+            sh "docker-compose stop"
             sh "docker-compose up -d"
         }
       }
