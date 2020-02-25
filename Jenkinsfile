@@ -4,28 +4,31 @@ pipeline {
    
    stages {
       stage('Build') {
-         agent { label 'Wraith_slave' }
-         steps {
-            sh "docker-compose build"
+         agent { label 'Build_slave' }
+         steps {       
+            sh "#!/bin/bash \n"+
+            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose build"
          }
       }
       stage('Test') {
-         agent { label 'Wraith_slave' }
+         agent { label 'Build_slave' }
          environment {
                 ERROR_FILE = 'web/failed.err'
             }
          steps {
             sh "ln web/startup/test.sh web/launch-django"
-            sh "docker-compose up --abort-on-container-exit"
+            sh "#!/bin/bash \n"+
+            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose up --abort-on-container-exit"
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
       }
       stage('Staging') {
-        agent { label 'Staging_slave' }
+        agent { label 'Stage_slave' }
         steps {
             sh "ln web/startup/runserver.sh web/launch-django"
             sh "docker-compose stop"
-            sh "docker-compose up -d"
+            sh "#!/bin/bash \n"+
+            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose up -d"
         }
       }
    }
