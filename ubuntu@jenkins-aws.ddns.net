@@ -1,0 +1,6 @@
+export APP_DB_ENGINE='django.db.backends.postgresql'
+export DB_NAME='django_db'
+export DB_USER='django_user'
+export DB_PASSWORD='django_unleashed'
+export DB_HOST='database'
+export DB_PORT='5432'

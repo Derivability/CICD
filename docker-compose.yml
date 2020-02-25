@@ -15,6 +15,13 @@ services:
         context: ./web
     volumes:
       - ./web:/usr/src/django
+    environment:
+      - APP_DB_ENGINE=${APP_DB_ENGINE}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
     ports:
       - "8000:8000"
     links:

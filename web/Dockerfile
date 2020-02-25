@@ -1,5 +1,6 @@
 FROM python:3.7.5
 
+
 WORKDIR /usr/src/django
 
 ENV PYTHONDONTWRITEBYTECODE 1

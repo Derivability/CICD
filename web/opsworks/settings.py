@@ -76,12 +76,12 @@ WSGI_APPLICATION = 'opsworks.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'django_db',
-        'USER': 'django_user',
-        'PASSWORD': 'django_unleashed',
-        'HOST': 'database',
-        'PORT': '5432',
+        'ENGINE': os.environ.get('APP_DB_ENGINE', ''),
+        'NAME': os.environ.get('DB_NAME', 'db.sqlite'),
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', None),
+        'PORT': os.environ.get('DB_PORT', None),
     }
 }
 
