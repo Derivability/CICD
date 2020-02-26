@@ -17,6 +17,11 @@ pipeline {
       }
    }
    post {
+      success {
+        node('master') {
+           build job: 'Opsworks'
+        }
+      }
       failure {
         node('master') {
            telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
