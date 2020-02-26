@@ -5,9 +5,9 @@ pipeline {
    stages {
       stage('Build') {
          agent { label 'Build_slave' }
-         steps {
-            sh "scp -i ~/.ssh/jenkins.pem ubuntu@jenkins-aws.ddns.net:/home/ubuntu/environment.env ./"
-            sh "source environment.env && docker-compose build"
+         steps {       
+            sh "#!/bin/bash \n"+
+            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose build"
          }
       }
       stage('Test') {
@@ -16,19 +16,19 @@ pipeline {
                 ERROR_FILE = 'web/failed.err'
             }
          steps {
-            sh "scp -i ~/.ssh/jenkins.pem ubuntu@jenkins-aws.ddns.net:/home/ubuntu/environment.env ./"
             sh "ln web/startup/test.sh web/launch-django"
-            sh "source environment.env docker-compose up --abort-on-container-exit"
+            sh "#!/bin/bash \n"+
+            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose up --abort-on-container-exit"
             sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
          }
       }
       stage('Staging') {
         agent { label 'Stage_slave' }
         steps {
-            sh "scp -i ~/.ssh/jenkins.pem ubuntu@jenkins-aws.ddns.net:/home/ubuntu/environment.env ./"
             sh "ln web/startup/runserver.sh web/launch-django"
             sh "docker-compose stop"
-            sh "source environment.env docker-compose up -d"
+            sh "#!/bin/bash \n"+
+            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose up -d"
         }
       }
    }
