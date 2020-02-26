@@ -7,15 +7,16 @@ pipeline {
          agent { label 'master' }
          steps {       
             sh "ansible-playbook ansible/java_install.yml"
-            }
          }
       }
+      stage('Install Docker') {
+         agent { label 'master' }
+         steps {       
+            sh "ansible-playbook ansible/docker_install.yml"
+         }
+      }
+   }
    post {
-      success {
-        node('master') {
-           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeed. More info: ${BUILD_URL}"
-         }
-      }
       failure {
         node('master') {
            telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
