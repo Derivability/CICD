@@ -6,8 +6,10 @@ pipeline {
       stage('Build') {
          agent { label 'Build_slave' }
          steps {       
-            sh "#!/bin/bash \n"+
-            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose build"
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
+                sh "#!/bin/bash \n"+
+                "source ${ENV_FILE} && docker-compose build"
+            }
          }
       }
       stage('Test') {
@@ -17,9 +19,11 @@ pipeline {
             }
          steps {
             sh "ln web/startup/test.sh web/launch-django"
-            sh "#!/bin/bash \n"+
-            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose up --abort-on-container-exit"
-            sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
+                sh "#!/bin/bash \n"+
+                "source ${ENV_FILE} && docker-compose up --abort-on-container-exit"
+                sh "if [ -f $ERROR_FILE ]; then exit 1; fi"
+            }
          }
       }
       stage('Staging') {
@@ -27,8 +31,10 @@ pipeline {
         steps {
             sh "ln web/startup/runserver.sh web/launch-django"
             sh "docker-compose stop"
-            sh "#!/bin/bash \n"+
-            "source /home/ubuntu/Jenkins/env/environment.env && docker-compose up -d"
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
+                sh "#!/bin/bash \n"+
+                "source ${ENV_FILE} && docker-compose up -d"
+            }
         }
       }
    }
