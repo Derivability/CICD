@@ -5,7 +5,10 @@ pipeline {
    stages {
       stage('Build') {
          agent { label 'Build_slave' }
-         steps {       
+         steps {
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db_init', variable: 'SQL_FILE']]) {
+                sh "cp ${SQL_FILE} db/init.sql"
+            }
             withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
                 sh "#!/bin/bash \n"+
                 "source ${ENV_FILE} && docker-compose build"
@@ -19,6 +22,9 @@ pipeline {
             }
          steps {
             sh "ln web/startup/test.sh web/launch-django"
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db_init', variable: 'SQL_FILE']]) {
+                sh "cp ${SQL_FILE} db/init.sql"
+            }
             withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
                 sh "#!/bin/bash \n"+
                 "source ${ENV_FILE} && docker-compose up --abort-on-container-exit"
@@ -31,6 +37,9 @@ pipeline {
         steps {
             sh "ln web/startup/runserver.sh web/launch-django"
             sh "docker-compose stop"
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db_init', variable: 'SQL_FILE']]) {
+                sh "cp ${SQL_FILE} db/init.sql"
+            }
             withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
                 sh "#!/bin/bash \n"+
                 "source ${ENV_FILE} && docker-compose up -d"
