@@ -111,7 +111,7 @@ EOF
 ### script begins here ###
 
 sudo apt update
-sudo apt install -y openjdk-8-jre
+sudo apt install -y openjdk-8-jre python
 
 wait_for_jenkins
 

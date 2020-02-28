@@ -5,7 +5,8 @@ pipeline {
    stages {
       stage('Install Java') {
          agent { label 'master' }
-         steps {       
+         steps {
+            cp       
             sh "ansible-playbook ansible/java_install.yml"
          }
       }

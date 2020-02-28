@@ -1,0 +1,41 @@
+pipeline {
+   
+   agent none
+   
+   stages {
+      stage('Setup slave') {
+         agent { label 'master' }
+         steps {       
+            sh "cp terraform/* ~/terraform"
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws_creds', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'], file(credentialsId: 'aws_pem', variable: 'TF_VAR_PEM'), file(credentialsId: 'jenkins_creds', variable: 'JENKINS_DATA')]) {
+               sh "#!/bin/bash \n" +
+               '''
+                 source ${JENKINS_DATA} 
+                 cd ~/terraform;
+                 terraform init;
+                 terraform apply -auto-approve;
+                 terraform output private_ip > /tmp/slaveip.txt
+               '''
+            }
+         }
+      }
+      stage('Configure Ansible') {
+         agent { label 'master' }
+         steps {       
+            sh "sed -i -E \"s/linux_1.*ansible_host=.*/linux_1 ansible_host=\$(cat /tmp/slaveip.txt)/\" ~/ansible/hosts"
+         }
+      }
+   }
+   post {
+      success {
+        node('master') {
+           build job: 'Opsworks_ansible'
+        }
+      }
+      failure {
+        node('master') {
+           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
+         }
+      }
+   }
+}
