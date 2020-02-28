@@ -2,7 +2,6 @@
 .idea
 *.swp
 *.pyc
-*.tfstate*
 web/launch-django
 terraform/.terraform/*
 terraform/secrets/*
