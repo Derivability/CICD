@@ -20,7 +20,7 @@ pipeline {
    post {
       success {
         node('master') {
-           build job: 'Opsworks'
+           build job: 'Opsworks', wait: false
         }
       }
       failure {

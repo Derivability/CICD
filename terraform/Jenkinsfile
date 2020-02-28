@@ -29,7 +29,7 @@ pipeline {
    post {
       success {
         node('master') {
-           build job: 'Opsworks_ansible'
+           build job: 'Opsworks_ansible', wait: false
         }
       }
       failure {
