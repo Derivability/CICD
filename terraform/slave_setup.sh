@@ -50,7 +50,7 @@ function slave_setup()
     # PASSWORD=$(cat /tmp/secret)
     PASSWORD="${JENKINS_PASS}"
 
-    SLAVE_IP=$(hostname -I)
+    SLAVE_IP=$(hostname -I | tr -s " ")
     NODE_NAME='Build_slave'
     NODE_SLAVE_HOME="/opt/jenkins-slave"
     EXECUTORS=1
