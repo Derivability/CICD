@@ -40,7 +40,7 @@ pipeline {
             withCredentials([[$class: 'FileBinding', credentialsId: 'django_db_init', variable: 'SQL_FILE']]) {
                 sh "cp ${SQL_FILE} db/init.sql"
             }
-            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
+            withCredentials([usernamePassword(credentialsId: 'django_web_creds', passwordVariable: 'DJANGO_ADMIN_PASS', usernameVariable: 'DJANGO_ADMIN'), file(credentialsId: 'django_db', variable: 'ENV_FILE')]) {
                 sh "#!/bin/bash \n"+
                 "source ${ENV_FILE} && docker-compose up -d"
             }

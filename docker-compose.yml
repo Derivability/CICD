@@ -16,6 +16,8 @@ services:
     volumes:
       - ./web:/usr/src/django
     environment:
+      - DJANGO_ADMIN=${DJANGO_ADMIN}
+      - DJANGO_ADMIN_PASS=${DJANGO_ADMIN_PASS}
       - APP_DB_ENGINE=${APP_DB_ENGINE}
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
