@@ -1,9 +1,21 @@
-<h1>{{ question.question_text }}</h1>
+<!DOCTYPE HTML>
+<html>
+<meta charset="utf-8">
+<title>Questionnaire</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<body>
+    <div id="wrapper">
+        <h1>{{ question.question_text }}</h1>
 
-<ul>
-{% for choice in question.choice_set.all %}
-    <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
-{% endfor %}
-</ul>
+        <ul>
+        {% for choice in question.choice_set.all %}
+            <li>{{ choice.choice_text }} -- {{ choice.votes }} vote{{ choice.votes|pluralize }}</li>
+        {% endfor %}
+        </ul>
 
-<a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+        <a href="{% url 'polls:detail' question.id %}">Vote again?</a>
+        <a href="{% url 'polls:index' %}">Go home</a>
+    </div>
+</body>
+</html>

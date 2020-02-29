@@ -1,17 +1,22 @@
+<!DOCTYPE HTML>
 <html>
-    <head>
-        <h2>Totally not fake questionnaire!</h2>
-    </head>
-    <body>
+<meta charset="utf-8">
+<title>Questionnaire</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<body>
+    <div id="wrapper">
+      <h1 align="center">Totally not fake questionnaire!</h1>
         {% if latest_question_list %}
-            <h3>Currently available polls:</h3>
-            <ul>
-            {% for question in latest_question_list %}
-                <li><h4><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></h4></li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <h3>No polls are available.</h3>
-        {% endif %}
-    </body>
+                <h3>Currently available polls:</h3>
+                <ul>
+                {% for question in latest_question_list %}
+                    <li><h4><a href="/polls/{{ question.id }}/">{{ question.question_text }}</a></h4></li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <h3>No polls are available.</h3>
+            {% endif %}
+    </div>
+</body>
 </html>
