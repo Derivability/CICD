@@ -50,14 +50,14 @@ function slave_setup()
     # PASSWORD=$(cat /tmp/secret)
     PASSWORD="${JENKINS_PASS}"
 
-    SLAVE_IP=$(hostname -I | tr -s " ")
-    NODE_NAME='Build_slave'
+    SLAVE_IP=$(ip -o -4 addr list | tail -n1 | awk '{print $4}' | cut -d/ -f1)
+    NODE_NAME="${AGENT_NAME}"
     NODE_SLAVE_HOME="/opt/jenkins-slave"
     EXECUTORS=1
     SSH_PORT=22
 
     CRED_ID="edu"
-    LABELS="build test linux"
+    LABELS="linux"
     USERID="ubuntu"
 
     cd /opt
@@ -110,8 +110,8 @@ EOF
 
 ### script begins here ###
 
-sudo apt update
-sudo apt install -y openjdk-8-jre python
+apt update
+apt install -y openjdk-8-jre python
 
 wait_for_jenkins
 

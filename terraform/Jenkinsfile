@@ -14,7 +14,8 @@ pipeline {
                  cd ~/terraform;
                  terraform init;
                  terraform apply -auto-approve;
-                 terraform output private_ip > /tmp/slaveip.txt
+                 terraform output slave_private_ip > /tmp/slaveip.txt
+                 terraform output stage_private_ip > /tmp/stageip.txt
                '''
             }
          }
@@ -23,6 +24,7 @@ pipeline {
          agent { label 'master' }
          steps {       
             sh "sed -i -E \"s/linux_1.*ansible_host=.*/linux_1 ansible_host=\$(cat /tmp/slaveip.txt)/\" ~/ansible/hosts"
+            sh "sed -i -E \"s/linux_2.*ansible_host=.*/linux_2 ansible_host=\$(cat /tmp/stageip.txt)/\" ~/ansible/hosts"
          }
       }
    }
