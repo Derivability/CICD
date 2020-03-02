@@ -25,6 +25,7 @@ function slave_setup()
     # Wait till jar file gets available
     ret=1
     while (( $ret != 0 )); do
+        sleep 10
         wget -O /opt/jenkins-cli.jar http://${JENKINS_IP}:8080/jnlpJars/jenkins-cli.jar
         ret=$?
 
@@ -78,7 +79,24 @@ function slave_setup()
 
       sleep 30
     done
+    
 
+    # Generating cred.xml for creating credentials on Jenkins server
+    cat > /tmp/cred.xml <<EOF
+<com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey plugin="ssh-credentials@1.16">
+  <scope>GLOBAL</scope>
+  <id>$CRED_ID</id>
+  <description>Generated via Terraform for $SLAVE_IP</description>
+  <username>$USERID</username>
+  <privateKeySource class="com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey\$DirectEntryPrivateKeySource">
+    <privateKey>${PEM}</privateKey>
+  </privateKeySource>
+</com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey>
+EOF
+
+    # Creating credential using cred.xml
+    cat /tmp/cred.xml | $jenkins_cmd create-credentials-by-xml system::system::jenkins _
+    
     # For Deleting Node, used when testing
     $jenkins_cmd delete-node $NODE_NAME
     
@@ -111,7 +129,7 @@ EOF
 ### script begins here ###
 
 apt update
-apt install -y openjdk-8-jre python
+apt install -y openjdk-8-jre-headless python
 
 wait_for_jenkins
 

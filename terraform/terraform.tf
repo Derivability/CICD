@@ -56,25 +56,75 @@ resource "aws_security_group" "allow_http" {
   }
 }
 
+resource "aws_security_group" "allow_jenkins_http" {
+  name        = "allow_jenkins_http"
+  description = "Allow http connections"
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+}
+
+data "local_file" "jenkins_worker_pem" {
+  filename = var.PEM_FILE
+}
 
 data "template_file" "userdata_jenkins_worker_linux" {
-  template = "${file("slave_setup.sh")}"
+  template = "${file("scripts/slave_setup.sh")}"
   vars = {
-    JENKINS_IP  = var.JENKINS_IP
+    JENKINS_IP  = aws_instance.jenkins_server.private_ip
     JENKINS_USER = var.JENKINS_USER
     JENKINS_PASS = var.JENKINS_PASS
     AGENT_NAME = "Build_slave"
+    PEM  = data.local_file.jenkins_worker_pem.content
   }
 }
 
 data "template_file" "userdata_jenkins_stage_linux" {
-  template = "${file("slave_setup.sh")}"
+  template = "${file("scripts/slave_setup.sh")}"
   vars = {
-    JENKINS_IP  = var.JENKINS_IP
+    JENKINS_IP  = aws_instance.jenkins_server.private_ip
     JENKINS_USER = var.JENKINS_USER
     JENKINS_PASS = var.JENKINS_PASS
     AGENT_NAME = "Stage_slave"
+    PEM  = data.local_file.jenkins_worker_pem.content
   }
+}
+
+data "template_file" "userdata_jenkins_server_linux" {
+  template = "${file("scripts/server_setup.sh")}"
+  vars = {
+    JENKINS_USER = var.JENKINS_USER
+    JENKINS_PASS = var.JENKINS_PASS
+    PEM  = data.local_file.jenkins_worker_pem.content
+  }
+}
+
+resource "aws_instance" "jenkins_server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+  security_groups = [aws_security_group.allow_ssh.name,aws_security_group.allow_jenkins_http.name]
+  key_name      = "edu"
+
+  user_data     = data.template_file.userdata_jenkins_server_linux.rendered
+  
+  tags = {
+    Name = "Terraform Jenkins"
+  }
+  credit_specification {
+    cpu_credits = "standard"
+  }
+  
 }
 
 resource "aws_instance" "slave" {
@@ -88,14 +138,9 @@ resource "aws_instance" "slave" {
   tags = {
     Name = "Terraform Slave"
   }
-}
-
-output "slave_public_ip" {
- value = aws_instance.slave.public_ip
-}
-
-output "slave_private_ip" {
- value = aws_instance.slave.private_ip
+  credit_specification {
+    cpu_credits = "standard"
+  }
 }
 
 resource "aws_instance" "stage" {
@@ -109,6 +154,25 @@ resource "aws_instance" "stage" {
   tags = {
     Name = "Terraform Stage"
   }
+  credit_specification {
+    cpu_credits = "standard"
+  }
+}
+
+output "jenkins_server_public_ip" {
+ value = aws_instance.jenkins_server.public_ip
+}
+
+output "jenkins_server_private_ip" {
+ value = aws_instance.jenkins_server.private_ip
+}
+
+output "slave_public_ip" {
+ value = aws_instance.slave.public_ip
+}
+
+output "slave_private_ip" {
+ value = aws_instance.slave.private_ip
 }
 
 output "stage_public_ip" {
