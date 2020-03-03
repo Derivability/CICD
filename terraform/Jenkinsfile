@@ -6,7 +6,7 @@ pipeline {
       stage('Setup slave') {
          agent { label 'master' }
          steps {       
-            sh "cp terraform/* ~/terraform"
+            sh "cp -r terraform/* ~/terraform"
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws_creds', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'], file(credentialsId: 'aws_pem', variable: 'TF_VAR_PEM'), file(credentialsId: 'jenkins_creds', variable: 'JENKINS_DATA')]) {
                sh "#!/bin/bash \n" +
                '''

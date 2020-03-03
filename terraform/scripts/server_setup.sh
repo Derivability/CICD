@@ -21,7 +21,7 @@ function wait_for_jenkins()
 function setup_iac()
 {
   cd /var/lib/jenkins/ansible
-  echo "${PEM}" > ~/edu.pem
+  echo "${PEM}" > /var/lib/jenkins/edu.pem
   chmod 600 /var/lib/jenkins/edu.pem
   cat > hosts <<EOF
 [build_servers]
@@ -34,7 +34,7 @@ stage_servers
 
 [stage_build:vars]
 ansible_user=ubuntu
-ansible_ssh_private_key_file=~/.ssh/edu.pem  
+ansible_ssh_private_key_file=~/edu.pem  
 EOF
   cat > ansible.cfg <<EOF
 [defaults]
@@ -99,8 +99,6 @@ function configure_jenkins_server ()
   echo "installing the Jenkins cli ..."
   cp /var/cache/jenkins/war/WEB-INF/jenkins-cli.jar /var/lib/jenkins/jenkins-cli.jar
 
-  # Getting initial password
-  # PASSWORD=$(cat /var/lib/jenkins/secrets/initialAdminPassword)
   PASSWORD="${JENKINS_PASS}"
   sleep 10
 
@@ -121,8 +119,6 @@ function configure_jenkins_server ()
   # List of plugins that are needed to be installed 
   plugin_list="workflow-cps pipeline-stage-tags-metadata pipeline-model-declarative-agent subversion jdk-tool pipeline-model-api ws-cleanup pam-auth timestamper workflow-api docker-commons script-security workflow-cps-global-lib token-macro command-launcher matrix-auth git jackson2-api gradle docker-workflow momentjs workflow-basic-steps variant workflow-aggregator structs github-branch-source durable-task scm-api pipeline-model-definition telegram-notifications handlebars pipeline-graph-analysis ssh-credentials pipeline-stage-view display-url-api apache-httpcomponents-client-4-api aws-java-sdk workflow-scm-step build-timeout jsch pipeline-milestone-step antisamy-markup-formatter cloudbees-folder ace-editor email-ext pipeline-rest-api workflow-step-api node-iterator-api mapdb-api matrix-project resource-disposer plain-credentials pipeline-model-extensions pipeline-stage-step workflow-multibranch credentials pipeline-input-step ec2 workflow-support ant aws-credentials pipeline-github-lib authentication-tokens junit github pipeline-build-step trilead-api ldap bouncycastle-api github-api git-client branch-api workflow-job workflow-durable-task-step mailer credentials-binding jquery-detached git-server ssh-slaves lockable-resources"
 
-  # remove existing plugins, if any ...
-  #rm -rfv $plugin_list
   ret=1
   while [ $ret = 1 ]
   do
@@ -161,9 +157,6 @@ function install_packages ()
 }
 
 ### script starts here ###
-
-
-
 
 install_packages
 

@@ -25,7 +25,7 @@ services:
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
     ports:
-      - "8000:8000"
+      - "80:8000"
     links:
       - "db:database"
     depends_on:
