@@ -106,6 +106,9 @@ data "template_file" "userdata_jenkins_server_linux" {
   vars = {
     JENKINS_USER = var.JENKINS_USER
     JENKINS_PASS = var.JENKINS_PASS
+    DNS_TOKEN    = var.DNS_TOKEN
+    TG_TOKEN     = var.TG_TOKEN
+    TG_CHAT_ID   = var.TG_CHAT_ID
     PEM  = data.local_file.jenkins_worker_pem.content
   }
 }

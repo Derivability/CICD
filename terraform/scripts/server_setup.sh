@@ -18,7 +18,7 @@ function wait_for_jenkins()
   echo "Jenkins launched"
 }
 
-function setup_iac()
+function setup_ansible()
 {
   cd /var/lib/jenkins/ansible
   echo "${PEM}" > /var/lib/jenkins/edu.pem
@@ -106,11 +106,9 @@ function configure_jenkins_server ()
   plugins_dir="$jenkins_dir/plugins"
   
   mkdir $jenkins_dir/ansible
-  mkdir $jenkins_dir/terraform
   setup_iac
   
   chown jenkins:jenkins -R $jenkins_dir/ansible
-  chown jenkins:jenkins -R $jenkins_dir/terraform
   
   cd $jenkins_dir
 
@@ -146,14 +144,18 @@ function install_packages ()
   apt-get install -y jenkins openjdk-8-jre-headless python python-pip xmlstarlet ansible unzip
   pip install bcrypt
   
-  wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip
-  cd /tmp
-  unzip terraform.zip
-  cp terraform /usr/bin/terraform
+  echo "@reboot sleep 37 ; wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${DNS_TOKEN} >> /tmp/freedns_jenkins-aws_strangled_net.log 2>&1" >> /tmp/newcron
+  crontab /tmp/newcron
+  rm /tmp/newcron
   
   systemctl enable jenkins
   systemctl restart jenkins
   sleep 10
+}
+
+function sendTgNotification ()
+{
+    curl -s -X POST https://api.telegram.org/bot${TG_TOKEN}/sendMessage -d chat_id=${TG_CHAT_ID} -d text="Infrastructure setup completed!"
 }
 
 ### script starts here ###
@@ -167,6 +169,10 @@ updating_jenkins_master_password
 wait_for_jenkins
 
 configure_jenkins_server
+
+wait_for_jenkins
+
+sendTgNotification
 
 echo "Done"
 exit 0 
