@@ -11,7 +11,17 @@ pipeline {
             }
             withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
                 sh "#!/bin/bash \n"+
-                "source ${ENV_FILE} && docker-compose build"
+                '''
+                tags=$(docker images | grep opsworks | awk '{print $2}')
+                for tag in $tags
+                do
+                    if [ $tag != "latest" ] && [ "$tag" -lt "$((${BUILD_NUMBER}-2))" ]
+                    then
+                        docker rmi $(docker images | grep opsworks | grep $tag | awk '{print $1}'):$tag || true
+                    fi
+                done
+                source ${ENV_FILE} && docker-compose build
+                '''
             }
          }
       }
@@ -36,10 +46,24 @@ pipeline {
         agent { label 'Stage_slave' }
         steps {
             sh "ln web/startup/runserver.sh web/launch-django"
-            sh "docker-compose stop"
             withCredentials([[$class: 'FileBinding', credentialsId: 'django_db_init', variable: 'SQL_FILE']]) {
                 sh "cp ${SQL_FILE} db/init.sql"
             }
+            withCredentials([[$class: 'FileBinding', credentialsId: 'django_db', variable: 'ENV_FILE']]) {
+                sh "#!/bin/bash \n"+
+                '''
+                tags=$(docker images | grep opsworks | awk '{print $2}')
+                for tag in $tags
+                do
+                    if [ $tag != "latest" ] && [ "$tag" -lt "$((${BUILD_NUMBER}-2))" ]
+                    then
+                        docker rmi $(docker images | grep opsworks | grep $tag | awk '{print $1}'):$tag || true
+                    fi
+                done
+                source ${ENV_FILE} && docker-compose build
+                '''
+            }
+            sh "docker-compose stop"
             withCredentials([usernamePassword(credentialsId: 'django_web_creds', passwordVariable: 'DJANGO_ADMIN_PASS', usernameVariable: 'DJANGO_ADMIN'), file(credentialsId: 'django_db', variable: 'ENV_FILE')]) {
                 sh "#!/bin/bash \n"+
                 "source ${ENV_FILE} && docker-compose up -d"
