@@ -22,6 +22,7 @@ pipeline {
                 done
                 source ${ENV_FILE} && docker-compose build
                 '''
+                sh "docker image prune -f"
             }
          }
       }
@@ -63,6 +64,7 @@ pipeline {
                 source ${ENV_FILE} && docker-compose build
                 '''
             }
+            sh "docker image prune -f"
             sh "docker-compose stop"
             withCredentials([usernamePassword(credentialsId: 'django_web_creds', passwordVariable: 'DJANGO_ADMIN_PASS', usernameVariable: 'DJANGO_ADMIN'), file(credentialsId: 'django_db', variable: 'ENV_FILE')]) {
                 sh "#!/bin/bash \n"+
