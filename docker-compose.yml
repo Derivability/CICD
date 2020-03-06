@@ -2,6 +2,7 @@ version: '2.1'
 
 services:
   db:
+    image: opsworks_db:${BUILD_NUMBER}
     build: ./db
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -11,6 +12,7 @@ services:
       timeout: 5s
       retries: 5
   web:
+    image: opsworks_web:${BUILD_NUMBER}
     build:
         context: ./web
     volumes:
