@@ -77,12 +77,12 @@ pipeline {
    post {
       success {
         node('master') {
-           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeed. More info: ${BUILD_URL}"
+           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeeded"
          }
       }
       failure {
         node('master') {
-           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
+           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed"
          }
       }
    }

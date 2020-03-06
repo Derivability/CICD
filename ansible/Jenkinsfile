@@ -3,6 +3,15 @@ pipeline {
    agent none
    
    stages {
+      stage('Update Config') {
+         agent { label 'master' }
+         steps {
+            sh "cat ~/nodes/Build_slave/config.xml | grep host | cut -f 2 -d '>' | cut -d '<' -f 1 > /tmp/slaveip.txt"
+            sh "cat ~/nodes/Stage_slave/config.xml | grep host | cut -f 2 -d '>' | cut -d '<' -f 1 > /tmp/stageip.txt"
+            sh "sed -i -E \"s/linux_1.*ansible_host=.*/linux_1 ansible_host=\$(cat /tmp/slaveip.txt)/\" /etc/ansible/hosts"
+            sh "sed -i -E \"s/linux_2.*ansible_host=.*/linux_2 ansible_host=\$(cat /tmp/stageip.txt)/\" /etc/ansible/hosts"
+         }
+      }
       stage('Install Java') {
          agent { label 'master' }
          steps {

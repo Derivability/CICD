@@ -109,6 +109,7 @@ data "template_file" "userdata_jenkins_server_linux" {
     DNS_TOKEN    = var.DNS_TOKEN
     TG_TOKEN     = var.TG_TOKEN
     TG_CHAT_ID   = var.TG_CHAT_ID
+    DATA         = var.DATA
     PEM  = data.local_file.jenkins_worker_pem.content
   }
 }
@@ -124,10 +125,36 @@ resource "aws_instance" "jenkins_server" {
   tags = {
     Name = "Terraform Jenkins"
   }
+  
   credit_specification {
     cpu_credits = "standard"
   }
   
+  provisioner "remote-exec" {
+    inline = [
+      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.DNS_TOKEN}"
+    ]
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      agent = "false"
+      private_key = file(var.PEM_FILE)
+      host = aws_instance.jenkins_server.public_ip
+    }
+  }
+  
+  provisioner "file" {
+    source = var.DATA
+    destination = "/tmp/data.tar.gz"
+    
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      agent = "false"
+      private_key = file(var.PEM_FILE)
+      host = aws_instance.jenkins_server.public_ip
+    }
+  }
 }
 
 resource "aws_instance" "slave" {
