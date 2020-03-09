@@ -97,22 +97,19 @@ EOF
 
 function import_data ()
 {
-	if [ "${DATA}" != "0" ]
-	then
-		while (( 1 )); do
-			echo "Waiting for Terraform to deliver data file ..."
+	while (( 1 )); do
+		echo "Waiting for Terraform to deliver data file ..."
 
-			if [[ -f "/tmp/data.tar.gz" ]]; then
-				break
-			fi
+		if [[ -f "/tmp/data.tar.gz" ]]; then
+			break
+		fi
 
-			sleep 10
-		done
-		tar -xvzf /tmp/data.tar.gz -C /var/lib/jenkins/
-		chown -R jenkins:jenkins /var/lib/jenkins
-	
-		systemctl restart jenkins
-	fi
+		sleep 10
+	done
+	tar -xvzf /tmp/data.tar.gz -C /var/lib/jenkins/
+	chown -R jenkins:jenkins /var/lib/jenkins
+
+	systemctl restart jenkins
 }
 
 function configure_jenkins_server ()
