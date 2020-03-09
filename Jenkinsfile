@@ -22,7 +22,6 @@ pipeline {
                 done
                 source ${ENV_FILE} && docker-compose build
                 '''
-                sh "docker image prune -f"
             }
          }
       }
@@ -64,7 +63,6 @@ pipeline {
                 source ${ENV_FILE} && docker-compose build
                 '''
             }
-            sh "docker image prune -f"
             sh "docker-compose stop"
             withCredentials([usernamePassword(credentialsId: 'django_web_creds', passwordVariable: 'DJANGO_ADMIN_PASS', usernameVariable: 'DJANGO_ADMIN'), file(credentialsId: 'django_db', variable: 'ENV_FILE')]) {
                 sh "#!/bin/bash \n"+
@@ -77,12 +75,12 @@ pipeline {
    post {
       success {
         node('master') {
-           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Succeeded"
+           telegramSend "✅ Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Successful. More info: ${BUILD_URL}"
          }
       }
       failure {
         node('master') {
-           telegramSend "Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed"
+           telegramSend "❌ Job \"${JOB_NAME}\": Build №${BUILD_NUMBER} Failed. More info: ${BUILD_URL}"
          }
       }
    }

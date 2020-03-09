@@ -129,20 +129,6 @@ resource "aws_instance" "jenkins_server" {
   credit_specification {
     cpu_credits = "standard"
   }
-  
-  provisioner "remote-exec" {
-    inline = [
-      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.DNS_TOKEN}"
-    ]
-    connection {
-      type = "ssh"
-      user = "ubuntu"
-      agent = "false"
-      private_key = file(var.PEM_FILE)
-      host = aws_instance.jenkins_server.public_ip
-    }
-  }
-  
   provisioner "file" {
     source = var.DATA
     destination = "/tmp/data.tar.gz"
@@ -155,8 +141,20 @@ resource "aws_instance" "jenkins_server" {
       host = aws_instance.jenkins_server.public_ip
     }
   }
+  provisioner "remote-exec" {
+    inline = [
+      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.DNS_TOKEN}"
+    ]
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      agent = "false"
+      private_key = file(var.PEM_FILE)
+      host = aws_instance.jenkins_server.public_ip
+    }
+  }
 }
-
+  
 resource "aws_instance" "slave" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = "t3.micro"
