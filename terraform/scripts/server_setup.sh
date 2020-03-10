@@ -134,7 +134,7 @@ function configure_jenkins_server ()
 	cd $plugins_dir || { echo "unable to chdir to [$plugins_dir]"; exit 1; }
 
 	# List of plugins that are needed to be installed 
-	plugin_list="workflow-cps pipeline-stage-tags-metadata pipeline-model-declarative-agent subversion jdk-tool pipeline-model-api ws-cleanup pam-auth timestamper workflow-api docker-commons script-security workflow-cps-global-lib token-macro command-launcher matrix-auth git jackson2-api gradle docker-workflow momentjs workflow-basic-steps variant workflow-aggregator structs github-branch-source durable-task scm-api pipeline-model-definition telegram-notifications handlebars pipeline-graph-analysis ssh-credentials pipeline-stage-view display-url-api apache-httpcomponents-client-4-api aws-java-sdk workflow-scm-step build-timeout jsch pipeline-milestone-step antisamy-markup-formatter cloudbees-folder ace-editor email-ext pipeline-rest-api workflow-step-api node-iterator-api mapdb-api matrix-project resource-disposer plain-credentials pipeline-model-extensions pipeline-stage-step workflow-multibranch credentials pipeline-input-step ec2 workflow-support ant aws-credentials pipeline-github-lib authentication-tokens junit github pipeline-build-step trilead-api ldap bouncycastle-api github-api git-client branch-api workflow-job workflow-durable-task-step mailer credentials-binding jquery-detached git-server ssh-slaves lockable-resources"
+	plugin_list="workflow-cps pipeline-stage-tags-metadata pipeline-model-declarative-agent subversion jdk-tool pipeline-model-api ws-cleanup pam-auth timestamper workflow-api docker-commons script-security workflow-cps-global-lib token-macro command-launcher matrix-auth git jackson2-api gradle docker-workflow momentjs workflow-basic-steps variant workflow-aggregator structs github-branch-source durable-task scm-api pipeline-model-definition telegram-notifications handlebars pipeline-graph-analysis ssh-credentials pipeline-stage-view display-url-api apache-httpcomponents-client-4-api aws-java-sdk workflow-scm-step build-timeout jsch pipeline-milestone-step antisamy-markup-formatter cloudbees-folder ace-editor email-ext pipeline-rest-api workflow-step-api node-iterator-api mapdb-api matrix-project resource-disposer plain-credentials pipeline-model-extensions pipeline-stage-step workflow-multibranch credentials pipeline-input-step ec2 workflow-support ant aws-credentials pipeline-github-lib authentication-tokens junit github pipeline-build-step trilead-api ldap bouncycastle-api github-api git-client branch-api workflow-job workflow-durable-task-step mailer credentials-binding jquery-detached git-server ssh-slaves lockable-resources publish-over-ssh"
 
 	ret=1
 	while [ $ret = 1 ]
@@ -178,27 +178,26 @@ function sendTgNotification ()
 
 ### script starts here ###
 
+sendTgNotification "Started installing packages..."
 install_packages
-
 wait_for_jenkins
+sendTgNotification "Packages installed!"
 
+sendTgNotification "Setting up Jenkins password..."
 updating_jenkins_master_password
-
-sendTgNotification "Jenkins password setup finished"
-
 wait_for_jenkins
+sendTgNotification "Jenkins password setup finished!"
 
+sendTgNotification "Started jenkins plugins installation.."
 configure_jenkins_server
-
-sendTgNotification "Jenkins configuration finished"
-
 wait_for_jenkins
+sendTgNotification "Jenkins plugins installed!"
 
+
+sendTgNotification "Importing Jenkins data..."
 import_data
-
-sendTgNotification "Jenkins data import finished"
-
 wait_for_jenkins
+sendTgNotification "Jenkins data import finished!"
 
 sendTgNotification "Jenkins server setup finished"
 
