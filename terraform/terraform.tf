@@ -106,7 +106,7 @@ data "template_file" "userdata_jenkins_server_linux" {
   vars = {
     JENKINS_USER = var.JENKINS_USER
     JENKINS_PASS = var.JENKINS_PASS
-    DNS_TOKEN    = var.DNS_TOKEN
+    DNS_TOKEN    = var.MASTER_DNS_TOKEN
     TG_TOKEN     = var.TG_TOKEN
     TG_CHAT_ID   = var.TG_CHAT_ID
     DATA         = var.DATA
@@ -127,7 +127,7 @@ resource "aws_instance" "jenkins_server" {
   }
   
   credit_specification {
-    cpu_credits = "standard"
+    cpu_credits = "unlimited"
   }
   provisioner "file" {
     source = var.DATA
@@ -143,7 +143,7 @@ resource "aws_instance" "jenkins_server" {
   }
   provisioner "remote-exec" {
     inline = [
-      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.DNS_TOKEN}"
+      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.MASTER_DNS_TOKEN}"
     ]
     connection {
       type = "ssh"
@@ -167,7 +167,7 @@ resource "aws_instance" "slave" {
     Name = "Terraform Slave"
   }
   credit_specification {
-    cpu_credits = "standard"
+    cpu_credits = "unlimited"
   }
 }
 
@@ -183,7 +183,19 @@ resource "aws_instance" "stage" {
     Name = "Terraform Stage"
   }
   credit_specification {
-    cpu_credits = "standard"
+    cpu_credits = "unlimited"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.STAGE_DNS_TOKEN}"
+    ]
+    connection {
+      type = "ssh"
+      user = "ubuntu"
+      agent = "false"
+      private_key = file(var.PEM_FILE)
+      host = aws_instance.jenkins_server.public_ip
+    }
   }
 }
 
