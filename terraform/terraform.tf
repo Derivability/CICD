@@ -143,7 +143,9 @@ resource "aws_instance" "jenkins_server" {
   }
   provisioner "remote-exec" {
     inline = [
-      "wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.MASTER_DNS_TOKEN}"
+      "echo \"@reboot sleep 37 ; wget --no-check-certificate -O - https://freedns.afraid.org/dynamic/update.php?${var.STAGE_DNS_TOKEN} >> /tmp/freedns_jenkins-aws_strangled_net.log 2>&1\" >> /tmp/newcron",
+    "crontab /tmp/newcron",
+    "rm /tmp/newcron"
     ]
     connection {
       type = "ssh"
